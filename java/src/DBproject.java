@@ -36,14 +36,14 @@ public class DBproject
 			System.out.println("Connection URL: " + url + "\n");
 			
 			// obtain a physical connection
-	        this._connection = DriverManager.getConnection(url, user, passwd);
-	        System.out.println("Done");
+	        	this._connection = DriverManager.getConnection(url, user, passwd);
+	        	System.out.println("Done");
 		}
 		catch(Exception e)
 		{
 			System.err.println("Error - Unable to Connect to Database: " + e.getMessage());
-	        System.out.println("Make sure you started postgres on this machine");
-	        System.exit(-1);
+	        	System.out.println("Make sure you started postgres on this machine");
+	        	System.exit(-1);
 		}
 	}
 	
@@ -164,14 +164,14 @@ public class DBproject
 			stmt = this._connection.createStatement();
 
 			//issues the query instruction 
-			ResultSet rs = stmt.executeQuery (query); 
+			ResultSet rs = stmt.executeQuery(query); 
 	 
 			/*
 		 	* obtains the metadata object for the returned result set.  The metadata 
 		 	* contains row and column info. 
 			*/ 
-			ResultSetMetaData rsmd = rs.getMetaData (); 
-			int numCol = rsmd.getColumnCount (); 
+			ResultSetMetaData rsmd = rs.getMetaData(); 
+			int numCol = rsmd.getColumnCount(); 
 	 
 			//iterates through the result set and saves the data returned by the query.
 			while (rs.next())
@@ -179,7 +179,7 @@ public class DBproject
 				List<String> record = new ArrayList<>(); 
 			
 				for (int i=1; i<=numCol; ++i) 
-					record.add(rs.getString (i)); 
+					record.add(rs.getString(i)); 
 			
 				result.add(record); 
 		
@@ -219,7 +219,7 @@ public class DBproject
 			stmt = this._connection.createStatement();
 			
 			//issues the query instruction
-			ResultSet rs = stmt.executeQuery (query);
+			ResultSet rs = stmt.executeQuery(query);
 
 			//iterates through the result set and count nuber of results.
 			while (rs.next())
@@ -487,16 +487,120 @@ public class DBproject
 	{
 		// For Cruise number and date, find the number of availalbe seats (i.e. total Ship capacity minus booked seats )
 		//Given a Cruise number and a departure date, find the number of available seats in the Cruise.
+
+		int cruiseNumber = -1;
+
+		do
+		{
+			System.out.print("Enter a cruise number: ");
+
+			try
+			{
+				cruiseNumber = Integer.parseInt(in.readLine());
+			}
+			catch (Exception e)
+			{
+				System.out.println("Input must be an integer!");
+			}
+		}
+		while (cruiseNumber < 0);
+		
+		try
+		{
+			String query1 = "SELECT Ship.seats\n" +
+                                	"FROM CruiseInfo, Ship\n" +
+                                	"WHERE CruiseInfo.cruise_id = " + cruiseNumber + " AND CruiseInfo.ship_id = Ship.id;";
+
+                	String query2 = "SELECT Cruise.num_sold\n" +
+                                	"FROM Cruise\n" +
+                                	"WHERE Cruise.cnum = " + cruiseNumber + " ;";
+
+                	List<List<String>> seatsResult = esql.executeQueryAndReturnResult(query1);
+                	List<List<String>> soldResult = esql.executeQueryAndReturnResult(query2);
+
+                	int numSeats = Integer.parseInt(seatsResult.get(0).get(0));
+                	int numSold = Integer.parseInt(soldResult.get(0).get(0));
+
+			System.out.println("The number of available seats for cruise " + cruiseNumber + " is " + (numSeats-numSold));
+		}
+		catch (Exception e)
+		{
+			System.out.println(e.getMessage());
+		}
 	}
 
 	public static void ListsTotalNumberOfRepairsPerShip(DBproject esql) //6
 	{
 		// Count number of repairs per Ships and list them in descending order
+		// Return the list of Ships in decreasing order of number of repairs that have been made on the Ships.
+
+		try
+		{
+			String query = "SELECT Repairs.ship_id, COUNT(Repairs.rid) AS repairCount\n" +
+					"FROM Repairs\n" +
+					"GROUP BY Repairs.ship_id\n" +
+					"ORDER BY repairCount DESC;";
+
+			esql.executeQueryAndPrintResult(query);
+		}
+		catch (Exception e)
+                {
+                        System.out.println(e.getMessage());
+                }
 	}
 
 	
 	public static void FindPassengersCountWithStatus(DBproject esql) //7
 	{
 		// Find how many passengers there are with a status (i.e. W,C,R) and list that number.
+		// For a given Cruise and passenger status, return the number of passengers with the given status.
+		
+		int cruiseNumber = -1;
+                do      
+                {       
+                        System.out.print("Enter a cruise number: ");
+                        
+                        try     
+                        {       
+                                cruiseNumber = Integer.parseInt(in.readLine());
+                        }
+                        catch (Exception e)
+                        {       
+                                System.out.println("Input must be an integer!");
+                        }
+                }
+                while (cruiseNumber < 0);
+
+		char status = 0;
+                do      
+                {       
+                        System.out.print("Enter a passenger status(W,C,R): ");
+                        
+                        try     
+                        {       
+                                status = in.readLine().charAt(0);
+				status = Character.toUpperCase(status);
+                        }
+                        catch (Exception e)
+                        {       
+                                System.out.println("Input must be a char!");
+                        }
+                }
+                while (status != 'W' && status != 'C' && status != 'R');
+
+		try
+		{
+			String query = "SELECT Reservation.rnum\n" +
+					"FROM Reservation\n" +
+                                        "WHERE Reservation.cid = " + cruiseNumber + " AND Reservation.status = '" + status + "';";
+
+			int numRows = esql.executeQuery(query);
+
+			System.out.println("There are " + numRows + " passengers with passenger status " + status + " on cruise " + cruiseNumber);
+		}
+		catch (Exception e)
+                {
+                        System.out.println(e.getMessage());
+                }
 	}
 }

@@ -14,6 +14,8 @@
 import java.sql.*;
 import java.io.*;
 import java.util.*;
+import java.util.Date;
+import java.text.*;
 
 /*
 * This class defines a simple embedded SQL utility class that is designed to work with PostgreSQL JDBC drivers.
@@ -260,9 +262,9 @@ public class DBproject
 
 		try
 		{
-			stmt = this._connection.createStatement ();
+			stmt = this._connection.createStatement();
 
-			rs = stmt.executeQuery (String.format("Select currval('%s')", sequence));
+			rs = stmt.executeQuery(String.format("Select currval('%s')", sequence));
 
 			if (rs.next())
 				hasNext = true;
@@ -481,6 +483,180 @@ public class DBproject
 			FOREIGN KEY (cid) REFERENCES Cruise(cnum)
 		);
 		*/
+
+		int rnum = 0;
+
+		try
+		{
+			String query = "SELECT Reservation.rnum\n" +
+					"FROM Reservation;";
+
+			rnum = esql.executeQuery(query) + 1;
+		}
+		catch (Exception e)
+                {
+                        System.out.println(e.getMessage());
+			System.out.println("Error...terminating command");
+			return;
+                }
+
+		int customerNumber = -1;
+                while (true)
+                {
+			System.out.print("Enter a nonnegative customer number: ");
+
+                        try
+                        {
+                                customerNumber = Integer.parseInt(in.readLine());
+
+				if (customerNumber < 0)
+				{
+					System.out.println("Customer number is negative, incorrect input!");
+					continue;
+				}
+
+				String query = "SELECT Customer.id\n" +
+						"FROM Customer\n" +
+						"WHERE Customer.id = " + customerNumber + ";";
+
+				if (esql.executeQuery(query) == 0)
+                                {
+                                        System.out.println("The record with Customer Number " + customerNumber + " does not exist.");
+                                        continue;
+                                }
+
+				break;
+                        }
+                        catch (NumberFormatException e)
+                        {
+                                System.out.println("Input must be an integer!");
+                        }
+			catch (SQLException e)
+                        {
+                                System.out.println("There are no records associated with that number!");
+                        }
+			catch (IOException e)
+			{
+				System.out.println(e.getMessage());
+				System.out.println("IO Error...terminating command");
+                        	return;
+			}
+                }
+
+		int cruiseNumber = -1;
+		while (true)
+		{
+			System.out.print("Enter a nonnegative cruise number: ");
+                        
+			try
+			{        
+                                cruiseNumber = Integer.parseInt(in.readLine());
+
+                                if (cruiseNumber < 0)
+                                {       
+                                        System.out.println("Cruise number is negative, incorrect input!");
+                                        continue;
+                                }       
+                                
+                                String query = "SELECT Cruise.cnum\n" +
+                                                "FROM Cruise\n" +
+                                                "WHERE Cruise.cnum = " + cruiseNumber + ";";
+                                                
+                                if (esql.executeQuery(query) == 0)
+                                {       
+                                        System.out.println("The record with Cruise Number " + cruiseNumber + " does not exist.");
+                                        continue;
+                                }
+
+				break;
+                                
+                        }
+                        catch (NumberFormatException e)
+                        {
+                                System.out.println("Input must be an integer!");
+                        }       
+                        catch (SQLException e)
+                        {
+                                System.out.println("There are no records associated with that number!");
+                        }
+			catch (IOException e)
+                        {
+                                System.out.println(e.getMessage());
+				System.out.println("IO Error...terminating command");
+                                return;
+                        }
+		}
+
+		char status = 0;
+		try
+                {
+			String query1 = "SELECT Schedule.arrival_time\n" +
+					"FROM Schedule\n" +
+					"WHERE Schedule.cruiseNum = " + cruiseNumber + " ;";
+
+			String query2 = "SELECT Cruise.actual_arrival_date\n" +
+					"FROM Cruise\n" +
+					"WHERE Cruise.cnum = " + cruiseNumber + " ;";
+
+                        String query3 = "SELECT Ship.seats\n" +
+                                        "FROM CruiseInfo, Ship\n" +
+                                        "WHERE CruiseInfo.cruise_id = " + cruiseNumber + " AND CruiseInfo.ship_id = Ship.id;";
+
+                        String query4 = "SELECT Cruise.num_sold\n" +
+                                        "FROM Cruise\n" +
+                                        "WHERE Cruise.cnum = " + cruiseNumber + " ;";
+
+			List<List<String>> scheduledArrResult = esql.executeQueryAndReturnResult(query1);
+                        List<List<String>> actualArrResult = esql.executeQueryAndReturnResult(query2);
+                        List<List<String>> seatsResult = esql.executeQueryAndReturnResult(query3);
+                        List<List<String>> soldResult = esql.executeQueryAndReturnResult(query4);
+
+
+			SimpleDateFormat sdfo = new SimpleDateFormat("yyyy-MM-dd");
+			Date scheduledArrDate = sdfo.parse(scheduledArrResult.get(0).get(0)); 
+			Date actualArrDate = sdfo.parse(actualArrResult.get(0).get(0));
+                        int numSeats = Integer.parseInt(seatsResult.get(0).get(0));
+                        int numSold = Integer.parseInt(soldResult.get(0).get(0));
+
+			int confirmedDate = scheduledArrDate.compareTo(actualArrDate);
+			int availableSeats = numSeats-numSold;
+
+			if (confirmedDate == 0 || confirmedDate < 0)
+				status = 'C';
+			else
+				status = (availableSeats > 0) ? 'R' : 'W';
+
+			if (status == 'R')
+			{
+				String query5 = "UPDATE Cruise\n" +
+						"SET num_sold = " + (numSold+1) + "\n" +
+						"WHERE cnum = " + cruiseNumber + " ;";
+
+				esql.executeUpdate(query5);
+			}
+                }
+                catch (Exception e)
+                {
+                        System.out.println(e.getMessage());
+			System.out.println("Error...terminating command");
+                        return;
+                }
+
+		try
+		{
+			String query = String.format("INSERT INTO Reservation\n" +
+							"VALUES ('%d', '%d', '%d', '%c');", 
+							rnum, customerNumber, cruiseNumber, status);
+
+			esql.executeUpdate(query);
+
+			System.out.println(String.format("Successfully inserted the record: (rnum:%d, customerID:%d, cruiseID:%d, status:%c)", 
+							rnum, customerNumber, cruiseNumber, status));
+		}
+		catch (Exception e)
+                {
+                        System.out.println(e.getMessage());
+                }
 	}
 
 	public static void ListNumberOfAvailableSeats(DBproject esql) //5
@@ -492,16 +668,22 @@ public class DBproject
 
 		do
 		{
-			System.out.print("Enter a cruise number: ");
+			System.out.print("Enter a nonnegative cruise number: ");
 
 			try
 			{
 				cruiseNumber = Integer.parseInt(in.readLine());
 			}
-			catch (Exception e)
-			{
-				System.out.println("Input must be an integer!");
-			}
+			catch (NumberFormatException e)
+                        {       
+                                System.out.println("Input must be an integer!");
+                        }       
+                        catch (IOException e)
+                        {       
+                                System.out.println(e.getMessage());
+                                System.out.println("IO Error...terminating command");
+                                return;
+                        }
 		}
 		while (cruiseNumber < 0);
 		
@@ -558,15 +740,21 @@ public class DBproject
 		int cruiseNumber = -1;
                 do      
                 {       
-                        System.out.print("Enter a cruise number: ");
+                        System.out.print("Enter a nonnegative cruise number: ");
                         
                         try     
                         {       
                                 cruiseNumber = Integer.parseInt(in.readLine());
                         }
-                        catch (Exception e)
+			catch (NumberFormatException e)
                         {       
                                 System.out.println("Input must be an integer!");
+                        }       
+                        catch (IOException e)
+                        {       
+                                System.out.println(e.getMessage());
+                                System.out.println("IO Error...terminating command");
+                                return;
                         }
                 }
                 while (cruiseNumber < 0);
@@ -581,22 +769,34 @@ public class DBproject
                                 status = in.readLine().charAt(0);
 				status = Character.toUpperCase(status);
                         }
-                        catch (Exception e)
+			catch (NumberFormatException e)
                         {       
-                                System.out.println("Input must be a char!");
+                                System.out.println("Input must be an integer!");
+                        }
+                        catch (IOException e)
+                        {   
+                                System.out.println(e.getMessage());
+                                System.out.println("IO Error...terminating command");
+                                return;
                         }
                 }
                 while (status != 'W' && status != 'C' && status != 'R');
 
 		try
 		{
-			String query = "SELECT Reservation.rnum\n" +
+			String query = "SELECT Reservation.ccid\n" +
 					"FROM Reservation\n" +
                                         "WHERE Reservation.cid = " + cruiseNumber + " AND Reservation.status = '" + status + "';";
 
-			int numRows = esql.executeQuery(query);
+			List<List<String>> passengerIDs = esql.executeQueryAndReturnResult(query);
 
-			System.out.println("There are " + numRows + " passengers with passenger status " + status + " on cruise " + cruiseNumber);
+			System.out.println("There are " + passengerIDs.size() + " passengers with passenger status " + status + " on cruise " + cruiseNumber + ", specifically");
+			
+			for (List<String> passengerID : passengerIDs)
+			{
+				for (String ccid : passengerID)
+					System.out.println("Passenger ID: " + ccid);
+			}
 		}
 		catch (Exception e)
                 {

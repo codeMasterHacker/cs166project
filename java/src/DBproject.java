@@ -420,52 +420,302 @@ public class DBproject
 	public static void AddShip(DBproject esql) //1
 	{
 		//Add Ship: Ask the user for details of a Ship and add it to the DB
-		/*
-		CREATE TABLE Ship
-		(
-			id INTEGER NOT NULL,
-			make CHAR(32) NOT NULL,
-			model CHAR(64) NOT NULL,
-			age _YEAR_1970 NOT NULL,
-			seats _SEATS NOT NULL,
-			PRIMARY KEY (id)
-		);
-		*/
+		String make = "";
+		String model = "";
+		int age = -1;
+		int seats = -1;
+		int rnum = 0;
+
+		do 
+		{
+			System.out.print("Enter the information for a new ship: \n");
+
+        		try
+       	 		{
+            			String query = "SELECT Reservation.rnum\n" +
+                    			"FROM Reservation;";
+
+            			rnum = esql.executeQuery(query) + 1;
+        		}
+        			catch (Exception e)
+                	{
+                        	System.out.println(e.getMessage());
+            			System.out.println("Error...terminating command");
+            			return;
+               		}
+
+			System.out.print("Enter make: \n");
+
+			try
+			{
+				make = in.readLine();
+			}
+			catch (Exception e)
+			{
+				System.out.println("Input must be a string!\n");
+			}
+
+			System.out.print("Enter model: \n");
+
+			try
+			{
+				model = in.readLine();
+			}
+			catch (Exception e)
+			{
+				System.out.println("Input must be a string!\n");
+			}
+
+			System.out.print("Enter age: \n");
+
+			try
+			{
+				age = Integer.parseInt(in.readLine());
+			}
+			catch (Exception e)
+			{
+				System.out.println("Input must be an integer!\n");
+			}
+
+			System.out.print("Enter seats: \n");
+
+			try
+			{
+				seats = Integer.parseInt(in.readLine());
+			}
+			catch (Exception e)
+			{
+				System.out.println("Input must be an integer!\n");
+			}
+
+			System.out.println("Inserting information into the DB\n");
+
+			break;
+		}
+
+		while(true);
+
+		try
+		{
+			String query = String.format("INSERT INTO Ship\n" +
+							"VALUES ('%d', '%s', '%s', '%d', '%d');",
+							rnum, make, model, age, seats);
+			
+			esql.executeUpdate(query);
+
+			System.out.println(String.format("Successfully inserted the record: (rnum:%d, make:%s, model:%s, age:%d, seats:%d)",
+							rnum, make, model, age, seats));
+		}
+
+		catch (Exception e)
+		{
+			System.out.println(e.getMessage());
+		}
 	}
 
 	public static void AddCaptain(DBproject esql) //2
 	{
 		//Add Captain: Ask the user for details of a Captain and add it to the DB
-		/*
-		CREATE TABLE Captain
-		(
-			id INTEGER NOT NULL,
-			fullname CHAR(128),
-			nationality CHAR(24),
-			PRIMARY KEY (id)
-		);
-		*/
-	}
+		String fullname = "";
+		String nationality = "";
+		int rnum = 0;
+
+		do
+		{
+			System.out.print("Enter the information for the new Captain\n");
+
+        		try
+       			{
+            			String query = "SELECT Reservation.rnum\n" +
+         	           		"FROM Reservation;";
+
+            			rnum = esql.executeQuery(query) + 1;
+       			}
+        			catch (Exception e)
+               		{	
+                        	System.out.println(e.getMessage());
+            			System.out.println("Error...terminating command");
+            			return;
+               		}
+
+			System.out.print("Enter fullname: \n");
+
+			try
+			{
+				fullname = in.readLine();
+			}
+			catch (Exception e)
+			{
+				System.out.println("Input must be a string!\n");
+			}
+
+			System.out.print("Enter naionality: \n");
+
+			try
+			{
+				nationality = in.readLine();
+			}
+			catch (Exception e)
+			{
+				System.out.println("Input must be a string!\n");
+			}
+
+			System.out.println("Inserting information into the DB\n");
+
+			break;
+		}
+
+		while(true);
+
+		try
+		{
+			String query = String.format("INSERT INTO Captain\n" +
+							"VALUES ('%d', '%s', '%s');",
+							rnum, fullname, nationality);
+			
+			esql.executeUpdate(query);
+
+			System.out.println(String.format("Successfully inserted the record: (rnum: %d, fullname:%s, nationality:%s)",
+							rnum, fullname, nationality));
+		}
+
+		catch (Exception e)
+		{
+			System.out.println(e.getMessage());
+		}
+	}	
 
 	public static void AddCruise(DBproject esql) //3
 	{
 		//Add Cruise: Ask the user for details of a Cruise and add it to the DB
-		/*
-		CREATE TABLE Cruise
-		(
-			cnum INTEGER NOT NULL,
-			cost _PINTEGER NOT NULL,
-			num_sold _PZEROINTEGER NOT NULL,
-			num_stops _PZEROINTEGER NOT NULL,
-			actual_departure_date DATE NOT NULL,
-			actual_arrival_date DATE NOT NULL,
-			arrival_port CHAR(5) NOT NULL,-- PORT CODE --
-			departure_port CHAR(5) NOT NULL,-- PORT CODE --
-			PRIMARY KEY (cnum)
-		);
-		*/
-	}
+		int cost = -1;
+		int num_sold = -1;
+		int num_stops = -1;
+		int actual_departure_date = -1;
+		int actual_arrival_date = -1;
+		String arrival_port = "";
+		String departure_port = "";
+		int rnum = 0;
 
+		do
+		{
+			System.out.print("Enter the information for the new Cruise\n");
+
+        		try
+        		{
+            			String query = "SELECT Reservation.rnum\n" +
+                    			"FROM Reservation;";
+
+            			rnum = esql.executeQuery(query) + 1;
+        		}
+        			catch (Exception e)
+                	{
+                        	System.out.println(e.getMessage());
+            			System.out.println("Error...terminating command");
+            			return;
+                	}
+
+			System.out.print("Enter cost: \n");
+
+			try
+			{
+				cost = Integer.parseInt(in.readLine());
+			}
+			catch (Exception e)
+			{
+				System.out.println("Input must be an integer!\n");
+			}
+
+			System.out.print("Enter num_sold: \n");
+
+			try
+			{
+				num_sold = Integer.parseInt(in.readLine());
+			}
+			catch (Exception e)
+			{
+				System.out.println("Input must be an integer!\n");
+			}
+
+			System.out.print("Enter num_stops: \n");
+
+			try
+			{
+				num_stops = Integer.parseInt(in.readLine());
+			}
+			catch (Exception e)
+			{
+				System.out.println("Input must be an integer!\n");
+			}
+
+			System.out.print("Enter actual_departure_date: \n");
+
+			try
+			{
+				actual_departure_date = Integer.parseInt(in.readLine());
+			}
+			catch (Exception e)
+			{
+				System.out.println("Input must be an integer!\n");
+			}
+
+			System.out.print("Enter actual_arrival_date: \n");
+
+			try
+			{
+				actual_arrival_date = Integer.parseInt(in.readLine());
+			}
+			catch (Exception e)
+			{
+				System.out.println("Input must be an integer!\n");
+			}
+
+			System.out.print("Enter arrival_port: \n");
+
+			try
+			{
+				arrival_port = in.readLine();
+			}
+			catch (Exception e)
+			{
+				System.out.println("Input must be a string!\n");
+			}
+
+			System.out.print("Enter departure_port: \n");
+
+			try
+			{
+				departure_port = in.readLine();
+			}
+			catch (Exception e)
+			{
+				System.out.println("Input must be a string!\n");
+			}
+
+			System.out.println("Inserting information into the DB\n");
+
+			break;
+		}
+
+		while(true);
+
+		try
+		{
+			String query = String.format("INSERT INTO Cruise\n" +
+							"Values ('%d', '%d', '%d', '%d', '%d', '%d', '%s', '%s');",
+							rnum, cost, num_sold, num_stops, actual_departure_date, actual_arrival_date, arrival_port, departure_port);
+
+			esql.executeUpdate(query);
+
+			System.out.println(String.format("Successfully inserted the record: (rnum:%d, cost:%d, num_sold:%d, num_stops:%d, actual_departure_date:%d, actual_arrival_date:%d, arrival_port:%s, departure_port:%s)",
+							rnum, cost, num_sold, num_stops, actual_departure_date, actual_arrival_date, arrival_port, departure_port));	
+		}
+
+		catch (Exception e)
+		{
+			System.out.println(e.getMessage());
+		}		
+	}
 
 	public static void BookCruise(DBproject esql) //4
 	{

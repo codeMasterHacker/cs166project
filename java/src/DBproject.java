@@ -424,49 +424,71 @@ public class DBproject
 		String model = "";
 		int age = -1;
 		int seats = -1;
-		int rnum = 0;
+		int id = 0;
 
-		do 
+		System.out.println("Enter the information for a new ship: ");
+
+		try
 		{
-			System.out.print("Enter the information for a new ship: \n");
+			String query = "SELECT Ship.id\n" +
+					"FROM Ship;";
 
-        		try
-       	 		{
-            			String query = "SELECT Reservation.rnum\n" +
-                    			"FROM Reservation;";
+			id = esql.executeQuery(query) + 1;
+		}
+		catch (Exception e)
+		{       
+			System.out.println(e.getMessage());
+                        System.out.println("Error...terminating command");
+                        return;
+		}
 
-            			rnum = esql.executeQuery(query) + 1;
-        		}
-        			catch (Exception e)
-                	{
-                        	System.out.println(e.getMessage());
-            			System.out.println("Error...terminating command");
-            			return;
-               		}
-
-			System.out.print("Enter make: \n");
+		while (true)
+		{
+			System.out.print("Enter make: ");
 
 			try
 			{
 				make = in.readLine();
+
+				for (int i = 0; i < make.length(); i++)
+				{
+					if (!Character.isLetter(make.charAt(i)))
+						throw new Exception("Not a string!");
+				}
+
+				break;
 			}
 			catch (Exception e)
 			{
-				System.out.println("Input must be a string!\n");
+				System.out.println("Input must be a string!");
 			}
+		}
 
-			System.out.print("Enter model: \n");
+		while (true)
+		{
+			System.out.print("Enter model: ");
 
 			try
 			{
 				model = in.readLine();
+
+				for (int i = 0; i < model.length(); i++)
+                                {
+                                        if (!Character.isLetter(model.charAt(i)))
+                                                throw new Exception("Not a string!");
+                                }
+
+				break;
 			}
 			catch (Exception e)
 			{
-				System.out.println("Input must be a string!\n");
+				System.out.println("Input must be a string!");
 			}
+		}
 
-			System.out.print("Enter age: \n");
+		do
+		{
+			System.out.print("Enter a nonnegative age: ");
 
 			try
 			{
@@ -474,10 +496,14 @@ public class DBproject
 			}
 			catch (Exception e)
 			{
-				System.out.println("Input must be an integer!\n");
+				System.out.println("Input must be an integer!");
 			}
+		}
+		while (age < 0);
 
-			System.out.print("Enter seats: \n");
+		do
+		{
+			System.out.print("Enter a nonnegative number of seats: ");
 
 			try
 			{
@@ -485,31 +511,29 @@ public class DBproject
 			}
 			catch (Exception e)
 			{
-				System.out.println("Input must be an integer!\n");
+				System.out.println("Input must be an integer!");
 			}
-
-			System.out.println("Inserting information into the DB\n");
-
-			break;
 		}
+		while(seats < 0);
 
-		while(true);
+		System.out.println("Inserting information into the DB");
 
 		try
 		{
 			String query = String.format("INSERT INTO Ship\n" +
 							"VALUES ('%d', '%s', '%s', '%d', '%d');",
-							rnum, make, model, age, seats);
+							id, make, model, age, seats);
 			
 			esql.executeUpdate(query);
 
-			System.out.println(String.format("Successfully inserted the record: (rnum:%d, make:%s, model:%s, age:%d, seats:%d)",
-							rnum, make, model, age, seats));
+			System.out.println(String.format("Successfully inserted the record: (id:%d, make:%s, model:%s, age:%d, seats:%d)",
+							id, make, model, age, seats));
 		}
 
 		catch (Exception e)
 		{
 			System.out.println(e.getMessage());
+			System.out.println("Insertion of information into the DB was UNSUCCESSFULL");
 		}
 	}
 
@@ -518,70 +542,87 @@ public class DBproject
 		//Add Captain: Ask the user for details of a Captain and add it to the DB
 		String fullname = "";
 		String nationality = "";
-		int rnum = 0;
+		int id = 0;
 
-		do
+		System.out.println("Enter the information for the new Captain:");
+
+		try
+		{       
+			String query = "SELECT Captain.id\n" +
+                                        "FROM Captain;";
+                                
+                        id = esql.executeQuery(query) + 1;
+                }       
+                catch (Exception e)
+                {       
+			System.out.println(e.getMessage());
+                        System.out.println("Error...terminating command");
+                        return;
+                }
+
+		while (true)
 		{
-			System.out.print("Enter the information for the new Captain\n");
-
-        		try
-       			{
-            			String query = "SELECT Reservation.rnum\n" +
-         	           		"FROM Reservation;";
-
-            			rnum = esql.executeQuery(query) + 1;
-       			}
-        			catch (Exception e)
-               		{	
-                        	System.out.println(e.getMessage());
-            			System.out.println("Error...terminating command");
-            			return;
-               		}
-
-			System.out.print("Enter fullname: \n");
+			System.out.print("Enter fullname: ");
 
 			try
 			{
 				fullname = in.readLine();
-			}
-			catch (Exception e)
-			{
-				System.out.println("Input must be a string!\n");
-			}
 
-			System.out.print("Enter naionality: \n");
+				for (int i = 0; i < fullname.length(); i++)
+                                {
+                                        if (!Character.isLetter(fullname.charAt(i)) && !Character.isSpaceChar(fullname.charAt(i)))
+                                                throw new Exception("Not a string!");
+                                }
+
+				break;
+                	}
+                	catch (Exception e)
+                	{
+				System.out.println("Input must be a string!");
+                	}
+		}
+
+		while (true)
+		{
+
+			System.out.print("Enter naionality: ");
 
 			try
 			{
 				nationality = in.readLine();
+
+				for (int i = 0; i < nationality.length(); i++)
+                                {
+					if (!Character.isLetter(nationality.charAt(i)) && !Character.isSpaceChar(nationality.charAt(i)))
+                                                throw new Exception("Not a string!");
+                                }
+				
+				break;
 			}
 			catch (Exception e)
 			{
-				System.out.println("Input must be a string!\n");
+				System.out.println("Input must be a string!");
 			}
-
-			System.out.println("Inserting information into the DB\n");
-
-			break;
 		}
 
-		while(true);
+		System.out.println("Inserting information into the DB");
 
 		try
 		{
 			String query = String.format("INSERT INTO Captain\n" +
 							"VALUES ('%d', '%s', '%s');",
-							rnum, fullname, nationality);
+							id, fullname, nationality);
 			
 			esql.executeUpdate(query);
 
-			System.out.println(String.format("Successfully inserted the record: (rnum: %d, fullname:%s, nationality:%s)",
-							rnum, fullname, nationality));
+			System.out.println(String.format("Successfully inserted the record: (id: %d, fullname:%s, nationality:%s)",
+							id, fullname, nationality));
 		}
 
 		catch (Exception e)
 		{
 			System.out.println(e.getMessage());
+			System.out.println("Insertion of information into the DB was UNSUCCESSFULL");
 		}
 	}	
 
@@ -595,27 +636,27 @@ public class DBproject
 		String actual_arrival_date = "";
 		String arrival_port = "";
 		String departure_port = "";
-		int rnum = 0;
+		int cnum = 0;
+
+		System.out.println("Enter the information for the new Cruise:");
+
+		try
+		{
+			String query = "SELECT Cruise.cnum\n" +
+                                        "FROM Cruise;";
+
+                        cnum = esql.executeQuery(query) + 1;
+		}
+                catch (Exception e)
+                {
+			System.out.println(e.getMessage());
+                        System.out.println("Error...terminating command");
+                        return;
+             	}
 
 		do
 		{
-			System.out.print("Enter the information for the new Cruise\n");
-
-        		try
-        		{
-            			String query = "SELECT Reservation.rnum\n" +
-                    			"FROM Reservation;";
-
-            			rnum = esql.executeQuery(query) + 1;
-        		}
-        			catch (Exception e)
-                	{
-                        	System.out.println(e.getMessage());
-            			System.out.println("Error...terminating command");
-            			return;
-                	}
-
-			System.out.print("Enter cost: \n");
+			System.out.print("Enter a nonnegative cost: ");
 
 			try
 			{
@@ -623,10 +664,14 @@ public class DBproject
 			}
 			catch (Exception e)
 			{
-				System.out.println("Input must be an integer!\n");
+				System.out.println("Input must be an integer!");
 			}
+		}
+		while (cost < 0);
 
-			System.out.print("Enter num_sold: \n");
+		do
+		{
+			System.out.print("Enter a nonnegative number of tickets sold: ");
 
 			try
 			{
@@ -634,10 +679,14 @@ public class DBproject
 			}
 			catch (Exception e)
 			{
-				System.out.println("Input must be an integer!\n");
+				System.out.println("Input must be an integer!");
 			}
+		}
+		while (num_sold < 0);
 
-			System.out.print("Enter num_stops: \n");
+		do
+		{
+			System.out.print("Enter a nonnegative number of stops: ");
 
 			try
 			{
@@ -645,75 +694,177 @@ public class DBproject
 			}
 			catch (Exception e)
 			{
-				System.out.println("Input must be an integer!\n");
+				System.out.println("Input must be an integer!");
 			}
+		}
+		while (num_stops < 0);
 
-			System.out.print("Enter actual_departure_date in the form YYYY-MM-DD: \n");
-
-			try
-			{
-				actual_departure_date = in.readLine();
-			}
-			catch (Exception e)
-			{
-				System.out.println("Input must be a string!\n");
-			}
-
-			System.out.print("Enter actual_arrival_date in the form YYYY-MM-DD: \n");
+		int year = -1;
+		do
+		{
+			System.out.print("Enter a departure year between 2014 and 2021: ");
 
 			try
-			{
-				actual_arrival_date = in.readLine();
-			}
-			catch (Exception e)
-			{
-				System.out.println("Input must be a string!\n");
-			}
+                        {
+                                year = Integer.parseInt(in.readLine());
+                        }
+                        catch (Exception e)
+                        {
+                                System.out.println("Input must be an integer!");
+                        }
+		}
+		while (year < 2014 || year > 2021);
 
-			System.out.print("Enter arrival_port: \n");
+		int m = -1;
+                do
+                {
+                        System.out.print("Enter a departure month(1 <-> 12): ");
+
+                        try
+                        {
+                                m = Integer.parseInt(in.readLine());
+                        }
+                        catch (Exception e)
+                        {
+                                System.out.println("Input must be an integer!");
+                        }
+                }
+                while (m < 1 || m > 12);
+		String month = (m < 10) ? "0"+Integer.toString(m) : Integer.toString(m);
+
+		int d = -1;
+                do
+                {
+                        System.out.print("Enter a departure day(1 <-> 31): ");
+
+                        try
+                        {
+                                d = Integer.parseInt(in.readLine());
+                        }
+                        catch (Exception e)
+                        {
+                                System.out.println("Input must be an integer!");
+                        }
+                }
+                while (d < 1 || d > 31);
+                String day = (d < 10) ? "0"+Integer.toString(d) : Integer.toString(d);
+
+		actual_departure_date = year + "-" + month + "-" + day;
+
+		year = -1;
+                do
+                {
+                        System.out.print("Enter an arrival year between 2014 and 2021: ");
+
+                        try
+                        {
+                                year = Integer.parseInt(in.readLine());
+                        }
+                        catch (Exception e)
+                        {
+                                System.out.println("Input must be an integer!");
+                        }
+                }
+                while (year < 2014 || year > 2021);
+
+                m = -1;
+                do
+                {
+                        System.out.print("Enter an arrival month(1 <-> 12): ");
+
+                        try
+                        {
+                                m = Integer.parseInt(in.readLine());
+                        }
+                        catch (Exception e)
+                        {
+                                System.out.println("Input must be an integer!");
+                        }
+                }
+                while (m < 1 || m > 12);
+                month = (m < 10) ? "0"+Integer.toString(m) : Integer.toString(m);
+
+                d = -1;
+                do
+                {
+                        System.out.print("Enter an arrival day(1 <-> 31): ");
+
+                        try
+                        {
+                                d = Integer.parseInt(in.readLine());
+                        }
+                        catch (Exception e)
+                        {
+                                System.out.println("Input must be an integer!");
+                        }
+                }
+                while (d < 1 || d > 31);
+                day = (d < 10) ? "0"+Integer.toString(d) : Integer.toString(d);
+
+                actual_arrival_date = year + "-" + month + "-" + day;
+
+		while (true)
+		{
+			System.out.print("Enter an arrival port: ");
 
 			try
 			{
 				arrival_port = in.readLine();
+	
+				for (int i = 0; i < arrival_port.length(); i++)
+                                {
+                                        if (!Character.isLetter(arrival_port.charAt(i)))
+                                                throw new Exception("Not a string!");
+                                }
+			
+				break;
 			}
 			catch (Exception e)
 			{
-				System.out.println("Input must be a string!\n");
+				System.out.println("Input must be a string!");
 			}
+		}
 
-			System.out.print("Enter departure_port: \n");
+		while (true)
+		{
+			System.out.print("Enter a departure port: ");
 
 			try
 			{
 				departure_port = in.readLine();
+
+				for (int i = 0; i < departure_port.length(); i++)
+                                {
+                                        if (!Character.isLetter(departure_port.charAt(i)))
+                                                throw new Exception("Not a string!");
+                                }
+				
+				break;
 			}
 			catch (Exception e)
 			{
-				System.out.println("Input must be a string!\n");
+				System.out.println("Input must be a string!");
 			}
-
-			System.out.println("Inserting information into the DB\n");
-
-			break;
 		}
 
-		while(true);
+		System.out.println("Inserting information into the DB");
 
 		try
 		{
 			String query = String.format("INSERT INTO Cruise\n" +
 							"Values ('%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s');",
-							rnum, cost, num_sold, num_stops, actual_departure_date, actual_arrival_date, arrival_port, departure_port);
+							cnum, cost, num_sold, num_stops, actual_departure_date, actual_arrival_date, arrival_port, departure_port);
 
 			esql.executeUpdate(query);
 
-			System.out.println(String.format("Successfully inserted the record: (rnum:%d, cost:%d, num_sold:%d, num_stops:%d, actual_departure_date:%s, actual_arrival_date:%s, arrival_port:%s, departure_port:%s)",
-							rnum, cost, num_sold, num_stops, actual_departure_date, actual_arrival_date, arrival_port, departure_port));	
+			System.out.println(String.format("Successfully inserted the record: (cnum:%d, cost:%d, num_sold:%d, num_stops:%d, actual_departure_date:%s, actual_arrival_date:%s, arrival_port:%s, departure_port:%s)",
+							cnum, cost, num_sold, num_stops, actual_departure_date, actual_arrival_date, arrival_port, departure_port));	
 		}
 
 		catch (Exception e)
 		{
 			System.out.println(e.getMessage());
+			System.out.println("Insertion of information into the DB was UNSUCCESSFULL");
 		}		
 	}
 
@@ -840,41 +991,31 @@ public class DBproject
 		char status = 0;
 		try
                 {
-			String query1 = "SELECT Schedule.arrival_time\n" +
-					"FROM Schedule\n" +
-					"WHERE Schedule.cruiseNum = " + cruiseNumber + " ;";
+			String query1 = "SELECT Reservation.status\n" +
+					"FROM Reservation\n" +
+					"WHERE Reservation.ccid = " + customerNumber + " AND Reservation.cid = " + cruiseNumber + ";";
 
-			String query2 = "SELECT Cruise.actual_arrival_date\n" +
-					"FROM Cruise\n" +
-					"WHERE Cruise.cnum = " + cruiseNumber + " ;";
-
-                        String query3 = "SELECT Ship.seats\n" +
+                        String query2 = "SELECT Ship.seats\n" +
                                         "FROM CruiseInfo, Ship\n" +
                                         "WHERE CruiseInfo.cruise_id = " + cruiseNumber + " AND CruiseInfo.ship_id = Ship.id;";
 
-                        String query4 = "SELECT Cruise.num_sold\n" +
+                        String query3 = "SELECT Cruise.num_sold\n" +
                                         "FROM Cruise\n" +
                                         "WHERE Cruise.cnum = " + cruiseNumber + " ;";
 
-			List<List<String>> scheduledArrResult = esql.executeQueryAndReturnResult(query1);
-                        List<List<String>> actualArrResult = esql.executeQueryAndReturnResult(query2);
-                        List<List<String>> seatsResult = esql.executeQueryAndReturnResult(query3);
-                        List<List<String>> soldResult = esql.executeQueryAndReturnResult(query4);
+			List<List<String>> resExistsResult = esql.executeQueryAndReturnResult(query1);
+                        List<List<String>> seatsResult = esql.executeQueryAndReturnResult(query2);
+                        List<List<String>> soldResult = esql.executeQueryAndReturnResult(query3);
 
-
-			SimpleDateFormat sdfo = new SimpleDateFormat("yyyy-MM-dd");
-			Date scheduledArrDate = sdfo.parse(scheduledArrResult.get(0).get(0)); 
-			Date actualArrDate = sdfo.parse(actualArrResult.get(0).get(0));
                         int numSeats = Integer.parseInt(seatsResult.get(0).get(0));
                         int numSold = Integer.parseInt(soldResult.get(0).get(0));
 
-			int confirmedDate = scheduledArrDate.compareTo(actualArrDate);
 			int availableSeats = numSeats-numSold;
 
-			if (confirmedDate == 0 || confirmedDate < 0)
+			status = (availableSeats > 0) ? 'R' : 'W';
+
+			if (!resExistsResult.isEmpty() && resExistsResult.get(0).get(0).charAt(0) == 'R')
 				status = 'C';
-			else
-				status = (availableSeats > 0) ? 'R' : 'W';
 
 			if (status == 'R')
 			{
@@ -884,28 +1025,22 @@ public class DBproject
 
 				esql.executeUpdate(query5);
 			}
+
+			String query4 = (!resExistsResult.isEmpty()) ? "UPDATE Reservation\n" +
+									"SET status = " + status + "\n" +
+									"WHERE ccid = " + customerNumber + " AND cid = " + cruiseNumber + ";" : 
+									String.format("INSERT INTO Reservation\n" +
+                                                        		"VALUES ('%d', '%d', '%d', '%c');", rnum, customerNumber, cruiseNumber, status);
+
+			esql.executeUpdate(query4);
+
+                        System.out.println(String.format("Successfully inserted/updated the record: (rnum:%d, customerID:%d, cruiseID:%d, status:%c)",
+							rnum, customerNumber, cruiseNumber, status));
                 }
                 catch (Exception e)
                 {
                         System.out.println(e.getMessage());
-			System.out.println("Error...terminating command");
-                        return;
-                }
-
-		try
-		{
-			String query = String.format("INSERT INTO Reservation\n" +
-							"VALUES ('%d', '%d', '%d', '%c');", 
-							rnum, customerNumber, cruiseNumber, status);
-
-			esql.executeUpdate(query);
-
-			System.out.println(String.format("Successfully inserted the record: (rnum:%d, customerID:%d, cruiseID:%d, status:%c)", 
-							rnum, customerNumber, cruiseNumber, status));
-		}
-		catch (Exception e)
-                {
-                        System.out.println(e.getMessage());
+			System.out.println("Unable to perform insert/update");
                 }
 	}
 

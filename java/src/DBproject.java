@@ -591,8 +591,8 @@ public class DBproject
 		int cost = -1;
 		int num_sold = -1;
 		int num_stops = -1;
-		int actual_departure_date = -1;
-		int actual_arrival_date = -1;
+		String actual_departure_date = "";
+		String actual_arrival_date = "";
 		String arrival_port = "";
 		String departure_port = "";
 		int rnum = 0;
@@ -648,26 +648,26 @@ public class DBproject
 				System.out.println("Input must be an integer!\n");
 			}
 
-			System.out.print("Enter actual_departure_date: \n");
+			System.out.print("Enter actual_departure_date in the form YYYY-MM-DD: \n");
 
 			try
 			{
-				actual_departure_date = Integer.parseInt(in.readLine());
+				actual_departure_date = in.readLine();
 			}
 			catch (Exception e)
 			{
-				System.out.println("Input must be an integer!\n");
+				System.out.println("Input must be a string!\n");
 			}
 
-			System.out.print("Enter actual_arrival_date: \n");
+			System.out.print("Enter actual_arrival_date in the form YYYY-MM-DD: \n");
 
 			try
 			{
-				actual_arrival_date = Integer.parseInt(in.readLine());
+				actual_arrival_date = in.readLine();
 			}
 			catch (Exception e)
 			{
-				System.out.println("Input must be an integer!\n");
+				System.out.println("Input must be a string!\n");
 			}
 
 			System.out.print("Enter arrival_port: \n");
@@ -702,12 +702,12 @@ public class DBproject
 		try
 		{
 			String query = String.format("INSERT INTO Cruise\n" +
-							"Values ('%d', '%d', '%d', '%d', '%d', '%d', '%s', '%s');",
+							"Values ('%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s');",
 							rnum, cost, num_sold, num_stops, actual_departure_date, actual_arrival_date, arrival_port, departure_port);
 
 			esql.executeUpdate(query);
 
-			System.out.println(String.format("Successfully inserted the record: (rnum:%d, cost:%d, num_sold:%d, num_stops:%d, actual_departure_date:%d, actual_arrival_date:%d, arrival_port:%s, departure_port:%s)",
+			System.out.println(String.format("Successfully inserted the record: (rnum:%d, cost:%d, num_sold:%d, num_stops:%d, actual_departure_date:%s, actual_arrival_date:%s, arrival_port:%s, departure_port:%s)",
 							rnum, cost, num_sold, num_stops, actual_departure_date, actual_arrival_date, arrival_port, departure_port));	
 		}
 

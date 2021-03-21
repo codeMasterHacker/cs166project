@@ -991,46 +991,52 @@ public class DBproject
 		char status = 0;
 		try
                 {
-			String query1 = "SELECT Reservation.status\n" +
-					"FROM Reservation\n" +
-					"WHERE Reservation.ccid = " + customerNumber + " AND Reservation.cid = " + cruiseNumber + ";";
+			//String query1 = "SELECT Reservation.status\n" +
+			//		"FROM Reservation\n" +
+			//		"WHERE Reservation.ccid = " + customerNumber + " AND Reservation.cid = " + cruiseNumber + ";";
 
-                        String query2 = "SELECT Ship.seats\n" +
-                                        "FROM CruiseInfo, Ship\n" +
-                                        "WHERE CruiseInfo.cruise_id = " + cruiseNumber + " AND CruiseInfo.ship_id = Ship.id;";
+                        //String query2 = "SELECT Ship.seats\n" +
+                          //              "FROM CruiseInfo, Ship\n" +
+                            //            "WHERE CruiseInfo.cruise_id = " + cruiseNumber + " AND CruiseInfo.ship_id = Ship.id;";
 
                         String query3 = "SELECT Cruise.num_sold\n" +
                                         "FROM Cruise\n" +
                                         "WHERE Cruise.cnum = " + cruiseNumber + " ;";
 
-			List<List<String>> resExistsResult = esql.executeQueryAndReturnResult(query1);
-                        List<List<String>> seatsResult = esql.executeQueryAndReturnResult(query2);
+			//List<List<String>> resExistsResult = esql.executeQueryAndReturnResult(query1);
+                        //List<List<String>> seatsResult = esql.executeQueryAndReturnResult(query2);
                         List<List<String>> soldResult = esql.executeQueryAndReturnResult(query3);
 
-                        int numSeats = Integer.parseInt(seatsResult.get(0).get(0));
+                        //int numSeats = Integer.parseInt(seatsResult.get(0).get(0));
                         int numSold = Integer.parseInt(soldResult.get(0).get(0));
+			int x = numSold;
+			numSold = numSold-1;
 
-			int availableSeats = numSeats-numSold;
-
-			status = (availableSeats > 0) ? 'R' : 'W';
-
-			if (!resExistsResult.isEmpty() && resExistsResult.get(0).get(0).charAt(0) == 'R')
-				status = 'C';
+			status = (numSold > 0) ? 'R' : 'W';
 
 			if (status == 'R')
 			{
 				String query5 = "UPDATE Cruise\n" +
-						"SET num_sold = " + (numSold+1) + "\n" +
-						"WHERE cnum = " + cruiseNumber + " ;";
+                "SET num_sold = " + (x+1) + "\n" +
+                "WHERE cnum = " + cruiseNumber + " ;";
+                                             
+               esql.executeUpdate(query5);
+			}	
 
-				esql.executeUpdate(query5);
-			}
+			//if (!resExistsResult.isEmpty() && resExistsResult.get(0).get(0).charAt(0) == 'R')
+			//	status = 'C';
 
-			String query4 = (!resExistsResult.isEmpty()) ? "UPDATE Reservation\n" +
-									"SET status = " + status + "\n" +
-									"WHERE ccid = " + customerNumber + " AND cid = " + cruiseNumber + ";" : 
-									String.format("INSERT INTO Reservation\n" +
-                                                        		"VALUES ('%d', '%d', '%d', '%c');", rnum, customerNumber, cruiseNumber, status);
+		//	if (status == 'R')
+		//	{
+		//		String query5 = "UPDATE Cruise\n" +
+		//				"SET num_sold = " + (numSold+1) + "\n" +
+		//				"WHERE cnum = " + cruiseNumber + " ;";
+//
+//				esql.executeUpdate(query5);
+//			}
+
+			String query4 = String.format("INSERT INTO Reservation\n" +
+                                                      		"VALUES ('%d', '%d', '%d', '%c');", rnum, customerNumber, cruiseNumber, status);
 
 			esql.executeUpdate(query4);
 
@@ -1074,21 +1080,21 @@ public class DBproject
 		
 		try
 		{
-			String query1 = "SELECT Ship.seats\n" +
-                                	"FROM CruiseInfo, Ship\n" +
-                                	"WHERE CruiseInfo.cruise_id = " + cruiseNumber + " AND CruiseInfo.ship_id = Ship.id;";
+//			String query1 = "SELECT Ship.seats\n" +
+//                                	"FROM CruiseInfo, Ship\n" +
+  //                              	"WHERE CruiseInfo.cruise_id = " + cruiseNumber + " AND CruiseInfo.ship_id = Ship.id;";
 
                 	String query2 = "SELECT Cruise.num_sold\n" +
                                 	"FROM Cruise\n" +
                                 	"WHERE Cruise.cnum = " + cruiseNumber + " ;";
 
-                	List<List<String>> seatsResult = esql.executeQueryAndReturnResult(query1);
+    //            	List<List<String>> seatsResult = esql.executeQueryAndReturnResult(query1);
                 	List<List<String>> soldResult = esql.executeQueryAndReturnResult(query2);
 
-                	int numSeats = Integer.parseInt(seatsResult.get(0).get(0));
+      //          	int numSeats = Integer.parseInt(seatsResult.get(0).get(0));
                 	int numSold = Integer.parseInt(soldResult.get(0).get(0));
 
-			System.out.println("The number of available seats for cruise " + cruiseNumber + " is " + (numSeats-numSold));
+			System.out.println("The number of available seats for cruise " + cruiseNumber + " is " + (numSold));
 		}
 		catch (Exception e)
 		{
